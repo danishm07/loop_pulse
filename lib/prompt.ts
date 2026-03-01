@@ -80,8 +80,8 @@ export function buildSystemPrompt(
 
 ${contextString}
 
-USER: ${profile.name} · ${profile.personas.join(' + ')} · 
-${profile.university} · cares about: ${profile.interests.join(', ')}
+USER: ${profile?.name ?? 'User'} · ${(profile?.personas ?? []).join(' + ')} · 
+${profile?.university ?? ''} · cares about: ${(profile?.interests ?? []).join(', ')}
 
 CURRENT FOCUS: ${getIntentInstructions(intent)}`
 }
