@@ -34,8 +34,15 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json(
-      { transcript: transcription.text },
-      { headers: { 'Access-Control-Allow-Origin': '*' } }
+      { text: transcription.text },
+      { 
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        }
+      }
     )
   } catch (error: any) {
     console.error('[TRANSCRIBE]', error)
