@@ -50,15 +50,6 @@ export interface GeoResult {
   fullAddress: string
 }
 
-export interface EventbriteData {
-  name: string
-  venue: string
-  time: string
-  price: string
-  distance: string
-  category: string
-}
-
 // ─── FETCHERS ────────────────────────────────────────────
 
 export async function fetchWeather(): Promise<WeatherData> {
@@ -452,75 +443,5 @@ export async function geocodeDestination(
   } catch(e: any) {
     console.log(`[GEOCODE] ✗ ${e.message}`)
     return null
-  }
-}
-
-export async function fetchEventbrite(): Promise<EventbriteData[]> {
-  const key = process.env.EVENTBRITE_API_KEY
-  if (!key) {
-    console.log('[EVENTBRITE] ✗ no key')
-    return []
-  }
-
-  try {
-    const now = new Date()
-    const today = now.toISOString().split('T')[0]
-    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    
-    const res = await fetch(
-      `https://www.eventbriteapi.com/v3/events/search/` +
-      `?location.address=Chicago%20Loop` +
-      `&start_date.range_start=${today}T00:00:00Z` +
-      `&start_date.range_end=${tomorrow}T23:59:59Z` +
-      `&expand=venue` +
-      `&sort_by=date` +
-      `&price=free` +
-      `&limit=5`,
-      {
-        headers: {
-          'Authorization': `Bearer ${key}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-
-    if (!res.ok) throw new Error(`status ${res.status}`)
-    const d = await res.json()
-    const events = d.events ?? []
-
-    const processed = events.map((e: any) => {
-      const venue = e.venue
-      const startTime = e.start?.local
-      const timeStr = startTime ? new Date(startTime).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      }) : 'Time TBD'
-
-      // Calculate rough distance from Loop center
-      const venueLat = venue?.latitude ?? 41.8827
-      const venueLng = venue?.longitude ?? -87.6233
-      const distance = Math.sqrt(
-        Math.pow(venueLat - 41.8827, 2) + 
-        Math.pow(venueLng - -87.6233, 2)
-      ) * 69 // Rough miles conversion
-
-      return {
-        name: e.name?.text ?? 'Event',
-        venue: venue?.name ?? 'Chicago venue',
-        time: timeStr,
-        price: e.is_free ? 'Free' : e.ticket_availability?.minimum_ticket_price?.major_value 
-          ? `$${e.ticket_availability.minimum_ticket_price.major_value}` 
-          : 'See site',
-        distance: `${distance.toFixed(1)} mi`,
-        category: e.category?.name ?? 'Event'
-      }
-    })
-
-    console.log(`[EVENTBRITE] ✓ real data — ${processed.length} free events`)
-    return processed
-  } catch(e: any) {
-    console.log(`[EVENTBRITE] ✗ ${e.message}`)
-    return []
   }
 }
