@@ -1,25 +1,33 @@
-# Chicago Atlas - Mobile Client
+# Loop Pulse - Core AI Engine
 
-Loop Pulse is a real-time, context-aware city intelligence platform for Chicago. This repository contains the mobile client, built to deliver low-latency AI interactions, real-time data visualizations, and high-fidelity native APIs (haptics, audio streaming).
+This repository contains the Next.js backend that powers the Loop Pulse mobile application. It acts as the data aggregation layer, API gateway, and LLM orchestrator.
 
 ## 🚀 Tech Stack & Technical Specs
-* **Framework:** React Native / Expo (SDK 50+)
+* **Framework:** Next.js (App Router)
+* **Deployment:** Vercel (Serverless Edge Functions)
 * **Language:** TypeScript
-* **Styling:** React Native StyleSheet & Context API for dynamic theming
-* **Native Modules:** `expo-av` (Audio playback/recording), `expo-file-system` (Caching), `expo-haptics` (Tactile feedback)
+* **Core APIs:** `/api/chat`, `/api/tts`, `/api/transcribe`, `/api/score`
 
-## 🧠 Core Features
-* **Harold (Conversational AI):** Siri-style voice and text assistant. Features push-to-talk recording, real-time Markdown rendering, and dynamic source attribution chips.
-* **Perplexity-Style Maps:** Parses AI responses to generate rich, native Google Maps cards using `Linking` for deep-linking into the native OS map application.
-* **Signals Dashboard:** A high-fidelity "Blueprint" grid utilizing the `Animated` API for radar pulses, avoiding the overhead and instability of heavy third-party map SDKs.
-* **Live Transit & CPD Drawer:** Real-time integration of CTA Train ETAs and Official Chicago Police Department (CPD) incident data, cleanly segmented from crowdsourced community reports.
+## 🧠 AI Integrations & APIs
+* **Groq (Llama 3.3 / Mixtral):** Handles the core NLP and conversational intelligence.
+* **ElevenLabs:** Powers the high-fidelity, ultra-realistic Text-to-Speech (TTS) for the "Harold" persona. 
+* **Perplexity API:** Used for deep "Discovery" context, fetching hyper-specific, real-time local gems and business data that standard LLMs lack.
+* **Whisper / Groq STT:** Transcribes user voice memos (`.m4a`) into text with near-instant turnaround.
+
+## 📊 Live Data Aggregation
+* **City of Chicago Data Portal (Socrata API):** Fetches real-time, official CPD dispatch and crime data.
+* **CTA API:** Retrieves live train tracker ETAs and system-wide transit alerts.
+* **Additional Sources:** Weather, Air Quality Index (AQI), Ticketmaster (Events), Yelp (Spots).
 
 ## 🛠 Why We Chose This Stack
-* **Expo & React Native:** Chosen for rapid cross-platform compilation and the ability to instantly tap into device hardware (Microphone, Haptics) without writing custom Swift/Kotlin bridges. 
-* **Pre-download Audio Strategy:** Instead of attempting to stream raw HTTP audio chunks (which causes `-1008` iOS player crashes on spotty hackathon Wi-Fi), the app uses `expo-file-system` to download the TTS payload to a temporary cache before playback, ensuring 100% stability during demos.
-* **AI-Assisted Development:** The frontend architecture, state management, and complex `Animated` native driver loops were scaffolded and refined utilizing **Gemini** for structural problem-solving and **Windsurf/GitHub Copilot** for rapid inline component generation.
+* **Groq over OpenAI:** For a voice-first assistant, latency is the bottleneck. Groq's LPU architecture provides unmatched tokens-per-second generation, allowing the Next.js backend to stream the response back to the phone almost instantaneously.
+* **Vercel Serverless:** Next.js deployed on Vercel allows the `/api/chat` route to spin up edge functions globally, minimizing the cold-start time and handling high concurrency without managing a dedicated Node.js server.
+* **Dynamic Grounding:** The backend dynamically injects real-time API data (CPD incidents, CTA delays, Weather) directly into the LLM's system prompt payload before inference. This prevents hallucinations and guarantees that "Harold" is always aware of the exact current state of Chicago.
 
 ## ⚙️ Local Setup
 1. Clone the repository and run `npm install`
-2. Configure `.env.local` with the required API keys (e.g., Azure Maps static tile key if applicable).
-3. Run `npx expo start` and scan the QR code using the Expo Go app.
+2. Create a `.env.local` file with the following keys:
+   ```env
+   GROQ_API_KEY=your_key
+   ELEVENLABS_API_KEY=your_key
+   PERPLEXITY_API_KEY=your_key
