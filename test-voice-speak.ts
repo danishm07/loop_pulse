@@ -135,7 +135,12 @@ async function speak(text: string): Promise<void> {
     try { unlinkSync(tmpAudio) } catch {}
     
   } catch(e: any) {
-    console.log('[SPEAK] ✗', e.message)
+    console.error('[SPEAK] ✗', {
+      message: e.message,
+      stack: e.stack,
+      voiceId: VOICE_ID,
+      textLength: text.slice(0, 500).length
+    })
   }
 }
 

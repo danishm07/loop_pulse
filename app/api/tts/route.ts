@@ -25,7 +25,17 @@ export async function GET(req: NextRequest) {
       }
     )
 
-    if (!response.ok) throw new Error(await response.text())
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[TTS] ElevenLabs API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        voiceId,
+        textLength: text.length
+      })
+      throw new Error(`ElevenLabs error (${response.status}): ${errorText}`)
+    }
 
     return new NextResponse(response.body, {
       headers: {

@@ -52,7 +52,14 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const err = await response.text()
-      throw new Error(`ElevenLabs error: ${err}`)
+      console.error('[SPEAK] ElevenLabs API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: err,
+        voiceId: VOICE_ID,
+        textLength: trimmed.length
+      })
+      throw new Error(`ElevenLabs error (${response.status}): ${err}`)
     }
 
     // Stream audio directly back to client

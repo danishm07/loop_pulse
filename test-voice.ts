@@ -72,7 +72,12 @@ async function speak(text: string): Promise<void> {
     console.log('Open that file to hear Harold\'s response.')
     
   } catch(e: any) {
-    console.log('[SPEAK] ✗', e.message)
+    console.error('[SPEAK] ✗', {
+      message: e.message,
+      stack: e.stack,
+      voiceId: VOICE_ID,
+      textLength: text.slice(0, 500).length
+    })
   }
 }
 

@@ -25,12 +25,18 @@ export async function POST(req: NextRequest) {
     const ctx = await getContext(profile)
     let contextString = buildContextString(ctx)
 
-    // 2. SMART PERPLEXITY TRIGGER
+    // 2. SMART PERPLEXITY TRIGGER & LOCATION INTENT DETECTION
     // If the user is asking for places, discovery, or recommendations, trigger Sonar
     const q = message.toLowerCase()
     const needsDiscovery = q.includes('recs') || q.includes('cafe') || q.includes('coffee') || 
                            q.includes('food') || q.includes('find') || q.includes('where') || 
-                           q.includes('lowkey') || q.includes('niche') || q.includes('stop at')
+                           q.includes('lowkey') || q.includes('niche') || q.includes('stop at') ||
+                           q.includes('restaurant') || q.includes('bar') || q.includes('park') ||
+                           q.includes('museum') || q.includes('shop') || q.includes('store') ||
+                           q.includes('location') || q.includes('place') || q.includes('spot') ||
+                           q.includes('venue') || q.includes('event') || q.includes('concert') ||
+                           q.includes('game') || q.includes('festival') || q.includes('meet') ||
+                           q.includes('directions') || q.includes('address') || q.includes('near me')
 
     if (needsDiscovery) {
       console.log("[ROUTER] Discovery intent detected. Firing Perplexity...")
